@@ -19038,7 +19038,7 @@ var StickyHeader = function () {
         return;
       }
 
-      var scrollThreshold = getHeaderOffset(this.header) + 20; // Extend threshold 20px past header
+      var scrollThreshold = getHeaderOffset(this.header) + 40; // Extend threshold 40px past header
       var shouldShrink = window.pageYOffset > scrollThreshold;
 
       // Sticky header is scrolled, is and is visible -- nothing more to do!
