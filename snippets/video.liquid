@@ -1,0 +1,66 @@
+{% assign platform = '' %}
+{%- if url contains 'youtube' or url contains 'youtu.be' -%}
+  {% assign platform = 'youtube' %}
+{% elsif url contains 'vimeo' -%}
+  {% assign platform = 'vimeo' %}
+{% endif %}
+
+<div
+  class="
+    video
+    video-aspect-ratio-{{ aspect_ratio }}
+  "
+  data-video="{{ platform }}"
+>
+  <div
+    class="video-cover"
+    {% if cover %}
+      {%
+        include 'rimg',
+        img: cover,
+        size: '1800x1000',
+        crop: 'center',
+        background: true,
+        lazy: true
+      %}
+    {% endif %}
+    data-video-cover
+  >
+    {% if cover %}
+      {%
+        include 'rimg',
+        img: cover,
+        size: '1800x1000',
+        crop: 'center',
+        canvas: true,
+        lazy: true
+      %}
+    {% endif %}
+
+    <div
+      class="video-overlay"
+      {% if overlay %}
+        style="background-color: {{ overlay }}"
+      {% endif %}
+    >
+      <button
+        class="
+          video-play-button
+          {% unless cover or slideshow %}
+            no-cover
+          {% endunless %}
+        "
+        data-video-play-button
+      >
+        {% include 'icon-library', id: 'icon-play' %}
+        {% include 'icon-library', id: 'icon-loading' %}
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="{{ platform }} {% if slideshow %}hide-player{% endif %}"
+    data-video-element
+    data-video-url="{{ url }}"
+  ></div>
+</div>

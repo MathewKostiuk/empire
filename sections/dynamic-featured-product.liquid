@@ -1,0 +1,160 @@
+{% assign product = all_products[section.settings.product] %}
+
+{% assign enable_recently_viewed = false %}
+{% assign recently_viewed_info = '' %}
+
+{% if settings.product_enable_recently_viewed_products %}
+  {% assign enable_recently_viewed = true %}
+
+  {% capture recently_viewed_image %}
+    {% if product.images.size > 0 %}
+      {{ product.images[0] | image_url: '180x180' | json }}
+    {% else %}
+      {%-
+        include 'placeholder_svg_uri'
+        placeholder: 'image'
+      -%}
+    {% endif %}
+  {% endcapture %}
+
+  {% if product.images.size < 1 %}
+    {% assign recently_viewed_image = recently_viewed_image | json %}
+  {% endif %}
+
+  {% assign selected_variant = product.selected_or_first_available_variant %}
+  {% assign compare_at_price = selected_variant.compare_at_price %}
+  {% assign price = selected_variant.price %}
+  {% assign product_available = product.available %}
+
+  {% assign on_sale = false %}
+  {% if compare_at_price > price %}
+    {% assign on_sale = true %}
+  {% endif %}
+
+  {% capture product_price %}
+    {%
+      include 'product-badge',
+      class_root: 'product',
+      product_available: product_available,
+      on_sale: on_sale,
+      price: price,
+      compare_at_price: compare_at_price,
+      show_saved: true
+    %}
+
+    {%
+      include 'product-price',
+      class_root: 'product',
+      price: price,
+      price_varies: false,
+      compare_at_price: compare_at_price,
+      compare_at_price_varies: false,
+      on_sale: on_sale,
+      emphasize_price: false,
+      show_original: true
+    %}
+  {% endcapture %}
+
+  {% capture recently_viewed_info %}
+    ,
+    "recently_viewed_info": {
+      "title": {{ product.title | json }},
+      "handle": {{ product.handle | json }},
+      "image": {{ recently_viewed_image }},
+      "link": {{ product.url | within: collection | json }},
+      "price": {{ product_price | json }}
+    },
+    "time": {
+      "second": {{ 'general.time.second' | t | json }},
+      "seconds": {{ 'general.time.seconds' | t | json }},
+      "minute": {{ 'general.time.minute' | t | json }},
+      "minutes": {{ 'general.time.minutes' | t | json }},
+      "hour": {{ 'general.time.hour' | t | json }},
+      "hours": {{ 'general.time.hours' | t | json }},
+      "ago": {{ 'general.time.ago' | t | json }}
+    }
+  {% endcapture %}
+{% endif %}
+
+<script
+  type="application/json"
+  data-section-type="dynamic-featured-product"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "settings": {
+      "cart_redirection": {{ section.settings.product_cart_redirect | json }},
+      "money_format": {{ shop.money_format | strip_html | json }},
+      "enable_video_autoplay": {{ section.settings.enable_video_autoplay | json }},
+      "enable_image_zoom": {{ settings.enable_image_zoom | json }},
+      "image_zoom_level": {{ settings.image_zoom_level | json }}
+    },
+    "context": {
+      "product_available": {{ 'product.buttons.add_to_cart' | t | json }},
+      "product_unavailable": {{ 'product.buttons.sold_out' | t | json }}
+    },
+    "product": {{ product | json }}
+    {% if enable_recently_viewed %}
+      {{ recently_viewed_info }}
+    {% endif %}
+  }
+</script>
+
+{% assign onboarding = true %}
+
+{% if section.settings.product != blank %}
+  {% assign onboarding = false %}
+{% endif %}
+
+<section class="featured-product--container home-section--content" data-product-wrapper>
+  <div class="featured-product--inner">
+    {%
+      include 'product',
+      is_product_modal: false,
+      hide_description: true,
+      onboarding: onboarding
+    %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured product",
+  "class": "featured-product--section",
+  "settings": [
+    {
+      "id": "product",
+      "type": "product",
+      "label": "Product"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video_autoplay",
+      "label": "Enable autoplay for product videos",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dcb",
+      "label": "Show dynamic checkout button",
+      "info": "Lets customers check out directly using a familiar payment method. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "product_cart_redirect",
+      "label": "Enable cart redirection",
+      "info": "Automatically sends users to the Cart page after adding a product.",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured product",
+      "category": "Product"
+    }
+  ]
+}
+
+{% endschema %}

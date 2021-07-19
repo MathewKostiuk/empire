@@ -1,0 +1,52 @@
+{% assign image = 'image_' | append: id %}
+{% assign text = 'text_' | append: id %}
+{% assign url = 'link_' | append: id %}
+{% assign position = 'position_' | append: id %}
+{% assign size = 'size_' | append: id %}
+
+{% assign image = settings[image] %}
+{% assign text = settings[text] %}
+{% assign url = settings[url] %}
+{% assign position = settings[position] %}
+{% assign size = settings[size] %}
+
+{% if image != blank %}
+  <li
+    class="
+      navmenu-meganav--image-container
+      navmenu-meganav--image-{{ position }}
+    "
+  >
+    {% if url %}
+      <a class="navmenu-meganav--image-link" href="{{ url }}">
+    {% endif %}
+      {% capture image_classes %}
+        navmenu-meganav--image
+        navmenu-meganav--image-size-{{ size }}
+      {% endcapture %}
+
+      {%
+        include 'rimg',
+        img: image,
+        class: image_classes,
+        size: '800x'
+        lazy: true,
+        canvas: true
+      %}
+    {% if url %}
+      </a>
+    {% endif %}
+
+    {% if text != blank %}
+      <p class="navmenu-meganav--image-text">
+        {% if url %}
+          <a class="navmenu-meganav--image-link" href="{{ url }}">
+        {% endif %}
+          {{ text | escape }}
+        {% if url %}
+          </a>
+        {% endif %}
+      </p>
+    {% endif %}
+  </li>
+{% endif %}
